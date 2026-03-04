@@ -1,99 +1,298 @@
-# AI-Based Intrusion Detection System (IDS)
+Perfect ✅ — below is a **clean, GitHub-ready `README.md`** file.
 
-An educational Final Year Project (FYP) implementation of an AI-based IDS that analyzes flow-level metadata (packet size, timing, duration) without decrypting payloads. It supports training classic ML models and provides a simple Flask dashboard to upload traffic flows and view anomaly detections and statistics.
+You can **copy and paste this directly into your GitHub README**.
 
-## Features
-- Flow-level feature extraction from packet or flow CSVs
-- Training scripts for RandomForest (optional XGBoost)
-- Inference utilities with supervised model or unsupervised fallback (IsolationForest)
-- Flask dashboard: upload CSV, view detections, traffic stats, and a results table
-- Kafka consumer stub for near-real-time integration
+---
 
-## Project Structure
+```markdown
+# Hybrid Intrusion Detection System (IDS)
+### Signature-Based + Anomaly-Based Detection
+
+---
+
+## 📌 Project Overview
+
+This project implements a **Hybrid Intrusion Detection System (IDS)** that combines:
+
+- 🔎 **Signature-Based Detection** using Suricata  
+- 📊 **Anomaly-Based Detection** using Tshark with statistical / ML-based analysis  
+- 🌐 **Flask Web Dashboard** for real-time monitoring  
+
+The system monitors network traffic, detects malicious activity, and visualizes alerts through a centralized dashboard.
+
+---
+
+## 🏗 System Architecture
+
 ```
-src/
-  features/flow_features.py       # Flow feature extraction utilities
-  models/train.py                 # Train RandomForest/XGBoost
-  models/infer.py                 # Load model and predict anomalies
-  webapp/app.py                   # Flask dashboard
-  webapp/templates/index.html     # Dashboard UI
-  webapp/static/css/style.css     # Basic styling
-  webapp/static/js/app.js         # (optional) UI scripts
-  streaming/kafka_consumer.py     # Kafka consumer stub
-  data/preprocess_cicids.py       # CICIDS preprocessing stub
-  config/settings.yaml            # Basic config
-artifacts/                        # Saved models (created at runtime)
+
+```
+            Network Interface
+                   │
+                   ▼
+           ┌──────────────┐
+           │  Suricata    │
+           └──────────────┘
+                   │
+            eve.json (logs)
+                   │
+                   ▼
+           Flask Ingest Engine
+                   │
+                   ▼
+              Dashboard
+
+                   ▲
+                   │
+           ┌──────────────┐
+           │   Tshark     │
+           └──────────────┘
+                   │
+           live_capture.py
+                   │
+           Anomaly Detection
+                   │
+                   ▼
+              Dashboard
 ```
 
-## Prerequisites
-- Python 3.9+ recommended
-- Optional: Wireshark/Tshark for packet capture (if using `pyshark` later)
-- Optional: Kafka for real-time streaming (`kafka-python` client included)
+````
 
-## Setup
+---
+
+# 🛠 Installation Guide (Linux – Recommended)
+
+## 1️⃣ Install System Dependencies
+
+```bash
+sudo apt update
+sudo apt install -y suricata tshark python3 python3-venv
+````
+
+Allow non-root packet capture:
+
+```bash
+sudo dpkg-reconfigure wireshark-common
+sudo usermod -aG wireshark $USER
+```
+
+Log out and log back in (or reboot).
+
+---
+
+## 2️⃣ Setup Python Environment
+
+```bash
+git clone https://github.com/<your-username>/FYP-IDS.git
+cd FYP-IDS
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+---
+
+## 3️⃣ Start Suricata (Signature-Based Detection)
+
+Replace `eth0` with your actual network interface:
+
+```bash
+sudo suricata -c /etc/suricata/suricata.yaml -i eth0 -l /var/log/suricata
+```
+
+Verify logs:
+
+```bash
+sudo tail -f /var/log/suricata/eve.json
+```
+
+---
+
+## 4️⃣ Run the IDS Dashboard
+
+```bash
+source .venv/bin/activate
+python src/webapp/app.py
+```
+
+Open in browser:
+
+```
+http://127.0.0.1:5000
+```
+
+---
+
+# 🪟 Installation Guide (Windows – Tshark Only Mode)
+
+> ⚠ Suricata is recommended on Linux.
+> On Windows, use Tshark-based anomaly detection mode.
+
+---
+
+## 1️⃣ Install Python
+
 ```powershell
-# From the project root (c:\FYP)
+winget install Python.Python.3
+```
+
+---
+
+## 2️⃣ Install Wireshark (Includes Tshark)
+
+```powershell
+winget install Wireshark.Wireshark
+```
+
+Confirm tshark location:
+
+```
+C:\Program Files\Wireshark\tshark.exe
+```
+
+Update `settings.yaml`:
+
+```yaml
+tshark_path: "C:\\Program Files\\Wireshark\\tshark.exe"
+```
+
+---
+
+## 3️⃣ Setup Python Environment
+
+```powershell
 python -m venv .venv
-.\.venv\Scripts\python -m pip install --upgrade pip
-.\.venv\Scripts\python -m pip install -r requirements.txt
+.\.venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-## Data Format
-- Packet-level CSV expected columns (minimal): `timestamp, src_ip, dst_ip, src_port, dst_port, protocol, packet_size`
-- Flow-level CSV expected columns: `packet_count, byte_count, mean_packet_size, std_packet_size, flow_duration, mean_iat, std_iat` (and optional identifiers)
+---
 
-The feature extractor will aggregate packet-level CSVs into flow-level features when possible.
+## 4️⃣ Run Dashboard
 
-## Train a Model
-Prepare a labeled flow CSV with a `label` column (0=benign, 1=attack):
 ```powershell
-.\.venv\Scripts\python src\models\train.py --input data\flows.csv --label label --algo rf --save-path artifacts\model.joblib
+python src\webapp\app.py
 ```
 
-Notes:
-- RandomForest (`rf`) requires no additional setup.
-- XGBoost (`xgb`) is optional; install `xgboost` first: `.\.venv\Scripts\python -m pip install xgboost`.
-- Metrics (Precision, Recall, F1) are printed after training.
+Open:
 
-## Run the Flask Dashboard
+```
+http://127.0.0.1:5000
+```
+
+---
+
+# 📦 requirements.txt
+
+```
+Flask
+flask-socketio
+pandas
+numpy
+scikit-learn
+joblib
+PyYAML
+pyshark
+scapy
+requests
+```
+
+---
+
+# 📁 .gitignore (Important)
+
+```
+.venv/
+__pycache__/
+*.pyc
+*.log
+ids.db
+artifacts/*.pkl
+```
+
+Never upload:
+
+* Suricata logs
+* Virtual environments
+* Database files
+* Trained models (unless intended)
+
+---
+
+# 🧪 Troubleshooting
+
+### ❌ Tshark Not Found
+
+Check:
+
+```bash
+which tshark
+```
+
+On Windows:
+
 ```powershell
-.\.venv\Scripts\python src\webapp\app.py
+Get-Command tshark
 ```
-Then open `http://localhost:5000/`. Upload a CSV of flows to see predicted anomalies and summary statistics.
 
-## Real-time (Kafka) – Optional
-- Configure a Kafka broker and topic, then adapt `src/streaming/kafka_consumer.py` to consume flow JSON messages.
-- The web app can be extended to ingest streaming results via websockets or server-sent events.
+---
 
-## Notes and Limitations
-- Payload inspection is out of scope due to encryption; detections rely on metadata patterns.
-- False positives are possible on highly variable traffic.
-- Real-time performance on high-speed networks may require optimization.
+### ❌ Suricata Not Generating Alerts
 
-## License
-This project is intended for academic use in a final year project context.
+Verify:
 
-## CICIDS2017 Integration
-- Download the dataset from `https://www.unb.ca/cic/datasets/ids-2017.html` or Kaggle and place the CSVs under `c:\FYP\dataset\CICIDS2017\`.
+```bash
+sudo tail -f /var/log/suricata/eve.json
+```
 
-- Preprocess to the project’s flow feature schema:
-  ```powershell
-  .\.venv\Scripts\python src\data\preprocess_cicids.py --input dataset\CICIDS2017 --output data\cicids_flows.csv
-  ```
-  - Produces `packet_count, byte_count, mean_packet_size, std_packet_size, flow_duration, mean_iat, std_iat, label, attack_category`.
-  - `label` is `0` for BENIGN and `1` for attacks; `attack_category` maps common CICIDS labels (DDoS, DoS, Port Scan, Brute Force, Botnet, Web Attack, etc.).
+Ensure correct interface is used.
 
-- Train a model on the preprocessed flows:
-  ```powershell
-  .\.venv\Scripts\python src\models\train.py --input data\cicids_flows.csv --label label --algo rf --save-path artifacts\model.joblib
-  ```
+---
 
-- Configure the dashboard to use the saved model by setting in `src\config\settings.yaml`:
-  ```yaml
-  model_path: artifacts/model.joblib
-  ```
+### ❌ No Traffic Detected
 
-- Use in the dashboard:
-  - Upload `data\cicids_flows.csv` via the Upload CSV form, or copy it to `data\dataflow.csv` and press `Replay dataflow.csv`.
-  - New visuals: Attack Breakdown (pie), Attack Frequency Over Time (line), Top Sources by Attack Volume (table), and an Attack Filter in the top bar.
-  - For live capture (optional), set your `tshark_path` and `default_interface` in `src\config\settings.yaml`, then click `Start Live Capture`.
+List interfaces:
+
+```bash
+tshark -D
+```
+
+Use a valid interface like:
+
+* `eth0`
+* `wlan0`
+* `enp0s3`
+
+---
+
+# 🎓 Academic Statement (For FYP Report)
+
+> The proposed system integrates signature-based detection using Suricata with anomaly-based detection leveraging real-time packet capture via Tshark. The system provides a centralized monitoring dashboard implemented in Flask for real-time visualization and alert management.
+
+---
+
+# 📜 License
+
+This project is developed for academic and research purposes.
+
+---
+
+# 👩‍💻 Author
+
+Your Name
+Final Year Project
+Cyber Security / Computer Science
+
+```
+
+---
+
+If you want, I can also generate:
+
+- ✅ A professional GitHub project description (short version)
+- ✅ A `Dockerfile` version
+- ✅ A SaaS-ready version README
+- ✅ A polished academic abstract for your thesis
+
+Just tell me 👩‍💻🚀
+```
