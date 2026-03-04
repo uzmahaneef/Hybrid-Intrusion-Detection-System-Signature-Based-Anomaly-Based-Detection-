@@ -1,6 +1,3 @@
-Perfect ✅ — below is a **clean, GitHub-ready `README.md`** file.
-
-You can **copy and paste this directly into your GitHub README**.
 
 ---
 
@@ -219,7 +216,7 @@ Never upload:
 
 ---
 
-# 🧪 Troubleshooting
+# Troubleshooting
 
 ### ❌ Tshark Not Found
 
@@ -296,3 +293,4 @@ If you want, I can also generate:
 
 Just tell me 👩‍💻🚀
 ```
+
