@@ -54,10 +54,9 @@ The system monitors network traffic, detects malicious activity, and visualizes 
 ```
 
 ````
-
 ---
 
-# 🛠 Installation Guide (Linux – Recommended)
+# 🪟 Installation Guide (Windows – Tshark Only Mode)
 
 ## 1️⃣ Install System Dependencies
 
@@ -268,29 +267,4 @@ Use a valid interface like:
 
 ---
 
-# 📜 License
-
-This project is developed for academic and research purposes.
-
----
-
-# 👩‍💻 Author
-
-Your Name
-Final Year Project
-Cyber Security / Computer Science
-
-```
-
----
-
-If you want, I can also generate:
-
-- ✅ A professional GitHub project description (short version)
-- ✅ A `Dockerfile` version
-- ✅ A SaaS-ready version README
-- ✅ A polished academic abstract for your thesis
-
-Just tell me 👩‍💻🚀
-```
 
